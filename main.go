@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-
 )
 
 func main() {
@@ -20,12 +19,15 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
-
+	userService.SaveAvatar(3, "images/raswan.png")
 	userHandler := handler.NewUserHandler(userService)
 
 	router := gin.Default()
 	api := router.Group("/api/v1")
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
+	api.POST("/email-checkers", userHandler.CheckEmailAvailibility)
+	api.POST("/avatars", userHandler.UploadAvatar)
+
 	router.Run()
 }
