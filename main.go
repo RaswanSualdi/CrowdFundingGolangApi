@@ -1,6 +1,7 @@
 package main
 
 import (
+	"go-project/auth"
 	"go-project/handler"
 	"go-project/user"
 	"log"
@@ -19,8 +20,10 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
-	userService.SaveAvatar(3, "images/raswan.png")
-	userHandler := handler.NewUserHandler(userService)
+	authService := auth.NewService()
+	// userService.SaveAvatar(3, "images/raswan.png")
+	// fmt.Println(authService.GenerateToken(1001))
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
 	api := router.Group("/api/v1")

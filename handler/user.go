@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"go-project/auth"
 	"go-project/helper"
 	"go-project/user"
 	"net/http"
@@ -11,10 +12,11 @@ import (
 
 type userHandler struct {
 	userService user.Service
+	authService auth.Service
 }
 
-func NewUserHandler(userService user.Service) *userHandler {
-	return &userHandler{userService}
+func NewUserHandler(userService user.Service, authService auth.Service) *userHandler {
+	return &userHandler{userService, authService}
 }
 func (h *userHandler) RegisterUser(c *gin.Context) {
 	//tangkap input dari user
@@ -35,7 +37,13 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	formatter := user.FormatUser(NewUser, "token")
+	token, err := h.authService.GenerateToken(NewUser.ID)
+	if err != nil {
+		response := helper.APIResponse("Register Account Failed ", http.StatusBadRequest, "Error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	formatter := user.FormatUser(NewUser, token)
 	responseData := helper.APIResponse("Account Has been Registered ", http.StatusOK, "success", formatter)
 	c.JSON(200, responseData)
 }
@@ -64,7 +72,14 @@ func (h *userHandler) Login(c *gin.Context) {
 		return
 	}
 
-	formatter := user.FormatUser(loggedInUser, "token")
+	token, err := h.authService.GenerateToken(loggedInUser.ID)
+	if err != nil {
+		response := helper.APIResponse("Login Failed ", http.StatusBadRequest, "Error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	formatter := user.FormatUser(loggedInUser, token)
 	response := helper.APIResponse("Successfully logged in ", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
 }
