@@ -38,6 +38,7 @@ func main() {
 
 	router.Run()
 }
+
 func authMiddleWare(authService auth.Service, userService user.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
