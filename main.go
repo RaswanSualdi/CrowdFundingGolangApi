@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"go-project/auth"
+	"go-project/campaign"
 	"go-project/handler"
 	"go-project/helper"
 	"go-project/user"
@@ -23,10 +25,13 @@ func main() {
 	}
 
 	userRepository := user.NewRepository(db)
+	campaignRepository := campaign.NewRepository(db)
+
 	userService := user.NewService(userRepository)
+	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
-	// userService.SaveAvatar(3, "images/raswan.png")
-	// fmt.Println(authService.GenerateToken(1001))
+	campaigns, _ := campaignService.FindCampaigns(0)
+	fmt.Println(len(campaigns))
 	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
